@@ -1,0 +1,19 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Bezorg_App.LoginPage"
+             Title="Login">
+	<VerticalStackLayout Padding="30" Spacing="15">
+		<Label Text="Voer je wachtwoord in" FontSize="24" HorizontalOptions="Center" />
+
+		<Entry x:Name="PasswordEntry"
+               Placeholder="Wachtwoord"
+               IsPassword="True"
+               Keyboard="Text" />
+
+		<Button Text="Login" Clicked="OnLoginClicked" />
+
+		<Label x:Name="ErrorLabel"
+               TextColor="Red"
+               IsVisible="False" />
+	</VerticalStackLayout>
+</ContentPage>

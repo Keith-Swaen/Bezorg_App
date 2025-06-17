@@ -1,4 +1,7 @@
-﻿namespace Bezorg_App;
+﻿using System;
+using Microsoft.Maui.Controls;
+
+namespace Bezorg_App;
 
 public partial class LoginPage : ContentPage
 {
@@ -9,14 +12,13 @@ public partial class LoginPage : ContentPage
 
     private async void OnLoginClicked(object sender, EventArgs e)
     {
-        var password = PasswordEntry.Text;
+        var password = PasswordEntry.Text?.Trim();  
 
         if (password == "admin")
         {
-            // Login succesvol, navigeer naar de hoofd- of homepagina
             await DisplayAlert("Succes", "Inloggen gelukt!", "OK");
 
-            // Bijvoorbeeld naar MainPage navigeren:
+            // Navigeer naar MainPage (vervangt huidige pagina)
             Application.Current.MainPage = new MainPage();
         }
         else

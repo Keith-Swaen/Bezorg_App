@@ -1,0 +1,68 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Bezorg_App.LoginPage"
+             Title="Login"
+             BackgroundColor="White">
+
+	<ScrollView>
+		<VerticalStackLayout Padding="30"
+							 Spacing="20"
+							 VerticalOptions="Start"
+							 HorizontalOptions="Fill">
+
+			<!-- Container voor logo en titel met minder spacing -->
+			<VerticalStackLayout Spacing="5" HorizontalOptions="Center">
+				<Image Source="logo.png"
+					   HeightRequest="250"
+					   WidthRequest="250"
+					   Aspect="AspectFit" />
+
+				<Label Text="Log in als bezorger"
+					   FontSize="26"
+					   FontAttributes="Bold"
+					   TextColor="#2C3E50"
+					   HorizontalOptions="Center" />
+			</VerticalStackLayout>
+
+			<!-- Wachtwoord invoer in frame met afgeronde hoeken -->
+			<Frame CornerRadius="10"
+				   Padding="0"
+				   HasShadow="False"
+				   BackgroundColor="#F2F2F7"
+				   HorizontalOptions="Fill"
+				   HeightRequest="50">
+
+				<Entry x:Name="PasswordEntry"
+					   Placeholder="Wachtwoord"
+					   IsPassword="True"
+					   Keyboard="Text"
+					   BackgroundColor="Transparent"
+					   TextColor="#2C3E50"
+					   Margin="15,0" />
+			</Frame>
+
+			<!-- Login knop in frame met afgeronde hoeken -->
+			<Frame CornerRadius="10"
+				   Padding="0"
+				   HasShadow="True"
+				   BackgroundColor="#2C3E50"
+				   HorizontalOptions="Fill"
+				   HeightRequest="50">
+
+				<Button Text="Inloggen"
+						Clicked="OnLoginClicked"
+						BackgroundColor="Transparent"
+						TextColor="White"
+						FontAttributes="Bold"
+						HorizontalOptions="FillAndExpand"
+						VerticalOptions="Center" />
+			</Frame>
+
+			<!-- Foutmelding -->
+			<Label x:Name="ErrorLabel"
+				   TextColor="Red"
+				   IsVisible="False"
+				   HorizontalOptions="Start" />
+		</VerticalStackLayout>
+	</ScrollView>
+</ContentPage>

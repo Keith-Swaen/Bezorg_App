@@ -19,7 +19,9 @@ public partial class LoginPage : ContentPage
             await DisplayAlert("Succes", "Inloggen gelukt!", "OK");
 
             // Navigeer naar MainPage (vervangt huidige pagina)
-            Application.Current.MainPage = new MainPage();
+            //Application.Current.MainPage = new MainPage();
+            Application.Current.MainPage = new NavigationPage(new MainPage());
+
         }
         else
         {

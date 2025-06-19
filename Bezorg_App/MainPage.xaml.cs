@@ -20,6 +20,12 @@
 
             SemanticScreenReader.Announce(CounterBtn.Text);
         }
+
+        private async void OnOrderDataClicked(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new OrderData());
+        }
+
     }
 
 }

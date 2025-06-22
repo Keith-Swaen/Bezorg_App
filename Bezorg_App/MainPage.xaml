@@ -40,6 +40,10 @@
                 Clicked="OnLocationClicked"
                 HorizontalOptions="Center"
                 VerticalOptions="Center"/>
+
+            <Button
+                Text="Open locatie in Google Maps"
+                Clicked="OnOpenInMapsClicked"/>
         </VerticalStackLayout>
     </ScrollView>
 

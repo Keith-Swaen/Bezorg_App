@@ -3,47 +3,61 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Bezorg_App.BevestigBezorging"
              Title="Bevestig Bezorging"
-             BackgroundColor="#F4F4F4">
+             BackgroundColor="#F9FAFB">
+
 
     <ScrollView>
-        <VerticalStackLayout Padding="30" Spacing="25" HorizontalOptions="FillAndExpand">
+        <VerticalStackLayout Padding="30" Spacing="30" HorizontalOptions="FillAndExpand">
+
 
             <Label Text="Bevestig de bezorging"
-               FontSize="24"
-               FontAttributes="Bold"
-               TextColor="#333"
-               HorizontalOptions="Center" />
+                   FontSize="26"
+                   FontAttributes="Bold"
+                   TextColor="#2C3E50"
+                   HorizontalOptions="Center" />
 
-            <Button Text="Bevestig bezorging"
-                FontSize="18"
-                BackgroundColor="#007AFF"
-                TextColor="White"
-                CornerRadius="12"
-                Padding="14"
-                HorizontalOptions="Center"
-                Clicked="OnBevestigBezorgingClicked" />
 
-            <Border Stroke="#CCCCCC"
-                StrokeThickness="2"
-                BackgroundColor="Transparent"
-                Padding="0"
-                HeightRequest="300"
-                WidthRequest="300"
-                IsVisible="False"
-                x:Name="PreviewImageBorder"
-                HorizontalOptions="Center">
+            <Frame HasShadow="True"
+                    Padding="0"
+                    CornerRadius="20"
+                    BackgroundColor="Transparent"
+                    HorizontalOptions="Center">
+                <Button Text="Bevestig bezorging"
+                    FontSize="18"
+                    BackgroundColor="#007AFF"
+                    TextColor="White"
+                    CornerRadius="16"
+                    Padding="16,12"
+                    WidthRequest="250"
+                    Clicked="OnBevestigBezorgingClicked" />
+            </Frame>
+
+
+
+            <Frame x:Name="PreviewImageBorder"
+                   IsVisible="False"
+                   WidthRequest="300"
+                   HeightRequest="300"
+                   BorderColor="#D0D3D4"
+                   CornerRadius="20"
+                   Padding="0"
+                   HasShadow="True"
+                   BackgroundColor="White"
+                   HorizontalOptions="Center">
                 <Image x:Name="PreviewImage"
-                   Aspect="AspectFill"
-                   BackgroundColor="#E0E0E0" />
-            </Border>
+                       Aspect="AspectFill"
+                       BackgroundColor="#E0E0E0" />
+            </Frame>
+
 
             <Label x:Name="ConfirmationLabel"
-               Text="Bezorging bevestigd!"
-               FontSize="20"
-               TextColor="Green"
-               FontAttributes="Bold"
-               IsVisible="False"
-               HorizontalOptions="Center" />
+                   Text="Bezorging bevestigd!"
+                   FontSize="20"
+                   TextColor="Green"
+                   FontAttributes="Bold"
+                   IsVisible="False"
+                   HorizontalOptions="Center"
+                   HorizontalTextAlignment="Center" />
 
         </VerticalStackLayout>
     </ScrollView>

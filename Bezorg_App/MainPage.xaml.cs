@@ -57,5 +57,38 @@ namespace Bezorg_App
                 await DisplayAlert("Fout", $"Er is een fout opgetreden: {ex.Message}", "OK");
             }
         }
+
+        private async void OnOpenInMapsClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                var location = await Geolocation.GetLastKnownLocationAsync();
+
+                if (location == null)
+                {
+                    location = await Geolocation.GetLocationAsync(new GeolocationRequest
+                    {
+                        DesiredAccuracy = GeolocationAccuracy.Medium,
+                        Timeout = TimeSpan.FromSeconds(10)
+                    });
+                }
+
+                if (location != null)
+                {
+                    var lat = location.Latitude.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                    var lon = location.Longitude.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                    var url = $"https://www.google.com/maps/search/?api=1&query={lat},{lon}";
+                    await Launcher.Default.OpenAsync(url);
+                }
+                else
+                {
+                    await DisplayAlert("Fout", "Kon locatie niet bepalen.", "OK");
+                }
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Fout", $"Er is een fout opgetreden: {ex.Message}", "OK");
+            }
+        }
     }
 }

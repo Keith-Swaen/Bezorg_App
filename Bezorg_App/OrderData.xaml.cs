@@ -30,7 +30,7 @@ public partial class OrderData : ContentPage
             {
                 var json = await response.Content.ReadAsStringAsync();
 
-                // OPTIONAL: Pretty print JSON
+                
                 var doc = JsonDocument.Parse(json);
                 var formatted = JsonSerializer.Serialize(doc, new JsonSerializerOptions { WriteIndented = true });
 

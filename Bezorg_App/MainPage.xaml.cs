@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Net.Http;
@@ -15,6 +15,9 @@ namespace Bezorg_App
     public partial class MainPage : ContentPage, INotifyPropertyChanged
     {
         private bool _isRefreshing;
+        private bool _isNavigating = false;
+        private static readonly System.Globalization.CultureInfo _culture = System.Globalization.CultureInfo.InvariantCulture;
+
         public bool IsRefreshing
         {
             get => _isRefreshing;
@@ -31,7 +34,7 @@ namespace Bezorg_App
         public Command RefreshCommand { get; }
         public Command<DeliveryState> StateTappedCommand { get; }
 
-        private IList<DeliveryState> _deliveryStates = new List<DeliveryState>();
+        private ObservableCollection<DeliveryState> _deliveryStates = new ObservableCollection<DeliveryState>();
 
         int count = 0;
 
@@ -79,13 +82,11 @@ namespace Bezorg_App
                     var updated = await service.UpdateAsync(state);
                     await DisplayAlert("Status bijgewerkt", $"Nieuwe status: {updated.State}", "OK");
 
-                    // Alleen het gewijzigde item vervangen in de lijst
+                    // Update lijst
                     int index = _deliveryStates.IndexOf(state);
                     if (index >= 0)
                     {
                         _deliveryStates[index] = updated;
-                        StatesCollectionView.ItemsSource = null;
-                        StatesCollectionView.ItemsSource = _deliveryStates;
                     }
                 }
                 catch (Exception ex)
@@ -99,9 +100,7 @@ namespace Bezorg_App
 
         private async void TestApiKey()
         {
-            var settings = MauiProgram.Services
-                                .GetRequiredService<IOptions<ApiSettings>>()
-                                .Value;
+            var settings = MauiProgram.Services.GetRequiredService<IOptions<ApiSettings>>().Value;
             string apiKey = settings.DeliveryApiKey;
             string url = $"http://51.137.100.120:5000/api/DeliveryServices/{apiKey}";
 
@@ -128,7 +127,14 @@ namespace Bezorg_App
         }
 
         private async void OnNavigateClicked(object sender, EventArgs e)
-            => await Navigation.PushAsync(new BevestigBezorging());
+        {
+            if (_isNavigating) return;
+            _isNavigating = true;
+
+            await Navigation.PushAsync(new BevestigBezorging());
+
+            _isNavigating = false;
+        }
 
         private async void OnLocationClicked(object sender, EventArgs e)
         {
@@ -165,8 +171,8 @@ namespace Bezorg_App
 
                 if (location != null)
                 {
-                    var lat = location.Latitude.ToString(System.Globalization.CultureInfo.InvariantCulture);
-                    var lon = location.Longitude.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                    var lat = location.Latitude.ToString(_culture);
+                    var lon = location.Longitude.ToString(_culture);
                     var url = $"https://www.google.com/maps/search/?api=1&query={lat},{lon}";
                     await Launcher.Default.OpenAsync(url);
                 }
@@ -191,10 +197,12 @@ namespace Bezorg_App
             {
                 var service = MauiProgram.Services.GetRequiredService<IDeliveryStateService>();
                 var allStates = await service.GetAllAsync();
-                _deliveryStates = allStates
-                                    .OrderByDescending(s => s.DateTime) // optioneel: nieuwste eerst
-                                    .Take(10)
-                                    .ToList();
+
+                _deliveryStates.Clear();
+                foreach (var state in allStates.OrderByDescending(s => s.DateTime).Take(10))
+                {
+                    _deliveryStates.Add(state);
+                }
 
                 StatesCollectionView.ItemsSource = _deliveryStates;
             }

@@ -6,7 +6,8 @@
         {
             InitializeComponent();
 
-            MainPage = new LoginPage();
+            // Start de app altijd met een NavigationPage
+            MainPage = new NavigationPage(new LoginPage());
         }
     }
 }

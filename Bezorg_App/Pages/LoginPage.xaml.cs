@@ -20,8 +20,8 @@ public partial class LoginPage : ContentPage
         {
             await DisplayAlert("Succes", "Inloggen gelukt!", "OK");
 
-            // Navigeer naar MainPage (vervangt huidige pagina)
-            Application.Current.MainPage = new MainPage();
+            // Navigeer naar MainPage binnen een NavigationPage
+            Application.Current.MainPage = new NavigationPage(new MainPage());
         }
         else
         {
@@ -47,8 +47,8 @@ public partial class LoginPage : ContentPage
             {
                 await DisplayAlert("Succes", "U bent ingelogd via vingerprint!", "OK");
 
-                // Navigeer naar MainPage (vervangt huidige pagina)
-                Application.Current.MainPage = new MainPage();
+                // Navigeer naar MainPage binnen een NavigationPage
+                Application.Current.MainPage = new NavigationPage(new MainPage());
             }
             else
             {

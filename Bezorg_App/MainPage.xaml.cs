@@ -1,4 +1,8 @@
-﻿using Microsoft.Maui.ApplicationModel;
+﻿using System;
+using System.Net.Http;
+using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.Controls;
+using Microsoft.Extensions.Options;
 
 namespace Bezorg_App
 {
@@ -9,6 +13,37 @@ namespace Bezorg_App
         public MainPage()
         {
             InitializeComponent();
+            TestApiKey();
+        }
+
+        private async void TestApiKey()
+        {
+            // Haal de API-sleutel op uit de configuratie via dependency injection
+            var settings = MauiProgram.Services
+                                       .GetRequiredService<IOptions<ApiSettings>>()
+                                       .Value;
+            string apiKey = settings.DeliveryApiKey;
+
+            string url = $"http://51.137.100.120:5000/api/DeliveryServices/{apiKey}";
+
+            using var httpClient = new HttpClient();
+            try
+            {
+                var response = await httpClient.GetAsync(url);
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    await DisplayAlert("API Key Test", "Success:\n" + json, "OK");
+                }
+                else
+                {
+                    await DisplayAlert("API Key Test", "Failed: " + response.StatusCode, "OK");
+                }
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("API Key Test", "Error: " + ex.Message, "OK");
+            }
         }
 
         private void OnCounterClicked(object sender, EventArgs e)
@@ -45,7 +80,10 @@ namespace Bezorg_App
 
                 if (location != null)
                 {
-                    await DisplayAlert("GPS Locatie", $"Latitude: {location.Latitude}\nLongitude: {location.Longitude}", "OK");
+                    await DisplayAlert(
+                        "GPS Locatie",
+                        $"Latitude: {location.Latitude}\nLongitude: {location.Longitude}",
+                        "OK");
                 }
                 else
                 {

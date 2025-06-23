@@ -8,7 +8,7 @@ using Bezorg_App.Models;
 namespace Bezorg_App.Services
 {
     /// <summary>
-    /// Roept de API aan om alle DeliveryStates op te halen.
+    /// Roept de API aan om alle DeliveryStates op te halen en te updaten.
     /// </summary>
     public class DeliveryStateService : IDeliveryStateService
     {
@@ -21,7 +21,6 @@ namespace Bezorg_App.Services
 
         public async Task<IList<DeliveryState>> GetAllAsync()
         {
-            // expliciet de volledige URL aanroepen voor duidelijkheid
             var requestUri = "api/DeliveryStates/GetAllDeliveryStates";
             HttpResponseMessage response;
 
@@ -31,14 +30,12 @@ namespace Bezorg_App.Services
             }
             catch (Exception httpEx)
             {
-                // network/TLS/DNS errors
                 throw new ApplicationException(
                     $"Netwerkfout bij GET {requestUri}: {httpEx.Message}", httpEx);
             }
 
             if (!response.IsSuccessStatusCode)
             {
-                // krijg je 404 / 500 / 401 / etc
                 var body = await response.Content.ReadAsStringAsync();
                 throw new ApplicationException(
                     $"API gaf status {(int)response.StatusCode} ({response.StatusCode}). Body:\n{body}");
@@ -47,15 +44,52 @@ namespace Bezorg_App.Services
             try
             {
                 var result = await response.Content
-                    .ReadFromJsonAsync<IList<DeliveryState>>();
+                                           .ReadFromJsonAsync<IList<DeliveryState>>();
                 return result ?? Array.Empty<DeliveryState>();
             }
             catch (Exception jsonEx)
             {
-                // JSON-deserialisatieproblemen
                 var raw = await response.Content.ReadAsStringAsync();
                 throw new ApplicationException(
                     $"Kon JSON niet deserialiseren:\n{jsonEx.Message}\nRAW:\n{raw}", jsonEx);
+            }
+        }
+
+        public async Task<DeliveryState> UpdateAsync(DeliveryState state)
+        {
+            // Endpoint uit swagger: POST /api/DeliveryStates/UpdateDeliveryState
+            HttpResponseMessage response;
+            try
+            {
+                response = await _httpClient.PostAsJsonAsync(
+                    "api/DeliveryStates/UpdateDeliveryState",
+                    state);
+            }
+            catch (Exception httpEx)
+            {
+                throw new ApplicationException(
+                    $"Netwerkfout bij POST UpdateDeliveryState: {httpEx.Message}", httpEx);
+            }
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var body = await response.Content.ReadAsStringAsync();
+                throw new ApplicationException(
+                    $"Update faalde ({(int)response.StatusCode}): {body}");
+            }
+
+            try
+            {
+                var updated = await response.Content
+                                           .ReadFromJsonAsync<DeliveryState>();
+                return updated
+                       ?? throw new ApplicationException("Geen state in response");
+            }
+            catch (Exception jsonEx)
+            {
+                var raw = await response.Content.ReadAsStringAsync();
+                throw new ApplicationException(
+                    $"Kon JSON niet deserialiseren na update:\n{jsonEx.Message}\nRAW:\n{raw}", jsonEx);
             }
         }
     }

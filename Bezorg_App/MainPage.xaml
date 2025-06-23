@@ -44,6 +44,28 @@
             <Button
                 Text="Open locatie in Google Maps"
                 Clicked="OnOpenInMapsClicked"/>
+
+            <Label
+                Text="Bezorgstatussen"
+                FontAttributes="Bold"
+                FontSize="18" />
+
+            <CollectionView
+                 x:Name="StatesCollectionView"
+                ItemsLayout="VerticalList"
+                HeightRequest="200">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame Padding="10" Margin="0,5" CornerRadius="5" BorderColor="LightGray">
+                            <VerticalStackLayout>
+                                <Label Text="{Binding Id, StringFormat='ID: {0}'}" />
+                                <Label Text="{Binding State}" />
+                                <Label Text="{Binding DateTime, StringFormat='Datum: {0:dd-MM-yyyy HH:mm}'}" />
+                            </VerticalStackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
         </VerticalStackLayout>
     </ScrollView>
 

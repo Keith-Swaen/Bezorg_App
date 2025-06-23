@@ -5,7 +5,7 @@ namespace Bezorg_App;
 
 public partial class OrderData : ContentPage
 {
-    private const string ApiUrl = "https://51.137.100.120:5001/api/DeliveryServices";
+    private const string ApiUrl = "http://51.137.100.120:5000/api/DeliveryServices";
     private const string ApiKey = "bbc3a1e6-98b8-42ce-98c3-0678bc59057a";
 
     public OrderData()
@@ -30,7 +30,7 @@ public partial class OrderData : ContentPage
             {
                 var json = await response.Content.ReadAsStringAsync();
 
-                
+
                 var doc = JsonDocument.Parse(json);
                 var formatted = JsonSerializer.Serialize(doc, new JsonSerializerOptions { WriteIndented = true });
 

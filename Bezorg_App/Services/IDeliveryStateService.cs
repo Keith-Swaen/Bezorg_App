@@ -4,11 +4,9 @@ using Bezorg_App.Models;
 
 namespace Bezorg_App.Services
 {
-    /// <summary>
-    /// Definieert het ophalen van bezorgstatussen.
-    /// </summary>
     public interface IDeliveryStateService
     {
         Task<IList<DeliveryState>> GetAllAsync();
+        Task<DeliveryState> UpdateAsync(DeliveryState state);
     }
 }

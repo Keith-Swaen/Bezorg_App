@@ -3,6 +3,8 @@ using System.Net.Http;
 using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Controls;
 using Microsoft.Extensions.Options;
+using Bezorg_App.Models;
+using Bezorg_App.Services;
 
 namespace Bezorg_App
 {
@@ -126,6 +128,27 @@ namespace Bezorg_App
             catch (Exception ex)
             {
                 await DisplayAlert("Fout", $"Er is een fout opgetreden: {ex.Message}", "OK");
+            }
+        }
+
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
+
+            try
+            {
+                var service = MauiProgram.Services
+                                  .GetRequiredService<IDeliveryStateService>();
+                var states = await service.GetAllAsync();
+                StatesCollectionView.ItemsSource = states;
+            }
+            catch (Exception ex)
+            {
+                // toont volledige stack en inner exceptions
+                await DisplayAlert(
+                    "Fout bij ophalen bezorgstatussen",
+                    ex.ToString(),
+                    "OK");
             }
         }
     }

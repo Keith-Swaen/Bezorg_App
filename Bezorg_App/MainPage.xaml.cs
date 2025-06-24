@@ -1,100 +1,21 @@
 ﻿using System;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Bezorg_App.Models;
-using Bezorg_App.Services;
+using Bezorg_App.Pages;
 using Microsoft.Extensions.Options;
 using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Controls;
 
 namespace Bezorg_App
 {
-    public partial class MainPage : ContentPage, INotifyPropertyChanged
+    public partial class MainPage : ContentPage
     {
-        private bool _isRefreshing;
         private bool _isNavigating = false;
         private static readonly System.Globalization.CultureInfo _culture = System.Globalization.CultureInfo.InvariantCulture;
-
-        public bool IsRefreshing
-        {
-            get => _isRefreshing;
-            set
-            {
-                if (_isRefreshing != value)
-                {
-                    _isRefreshing = value;
-                    OnPropertyChanged(nameof(IsRefreshing));
-                }
-            }
-        }
-
-        public Command RefreshCommand { get; }
-        public Command<DeliveryState> StateTappedCommand { get; }
-
-        private ObservableCollection<DeliveryState> _deliveryStates = new ObservableCollection<DeliveryState>();
-
-        int count = 0;
 
         public MainPage()
         {
             InitializeComponent();
-
-            BindingContext = this;
-
-            RefreshCommand = new Command(async () =>
-            {
-                IsRefreshing = true;
-                await LoadStatesAsync();
-                IsRefreshing = false;
-            });
-
-            StateTappedCommand = new Command<DeliveryState>(async (state) =>
-            {
-                string actie = await DisplayActionSheet(
-                    $"Update status voor Order {state.OrderId}",
-                    "Annuleer",
-                    null,
-                    "In afwachting",
-                    "Onderweg",
-                    "Afgeleverd",
-                    "Geannuleerd");
-
-                if (actie is null or "Annuleer")
-                    return;
-
-                state.State = actie switch
-                {
-                    "In afwachting" => DeliveryStateEnum.Pending,
-                    "Onderweg" => DeliveryStateEnum.InProgress,
-                    "Afgeleverd" => DeliveryStateEnum.Completed,
-                    "Geannuleerd" => DeliveryStateEnum.Cancelled,
-                    _ => state.State
-                };
-
-                state.DateTime = DateTime.UtcNow;
-
-                try
-                {
-                    var service = MauiProgram.Services.GetRequiredService<IDeliveryStateService>();
-                    var updated = await service.UpdateAsync(state);
-                    await DisplayAlert("Status bijgewerkt", $"Nieuwe status: {updated.State}", "OK");
-
-                    // Update lijst
-                    int index = _deliveryStates.IndexOf(state);
-                    if (index >= 0)
-                    {
-                        _deliveryStates[index] = updated;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    await DisplayAlert("Fout bij update", ex.Message, "OK");
-                }
-            });
-
             TestApiKey();
         }
 
@@ -117,13 +38,6 @@ namespace Bezorg_App
             {
                 await DisplayAlert("API Key Test", "Error: " + ex.Message, "OK");
             }
-        }
-
-        private void OnCounterClicked(object sender, EventArgs e)
-        {
-            count++;
-            CounterBtn.Text = count == 1 ? $"Clicked {count} time" : $"Clicked {count} times";
-            SemanticScreenReader.Announce(CounterBtn.Text);
         }
 
         private async void OnNavigateClicked(object sender, EventArgs e)
@@ -185,49 +99,9 @@ namespace Bezorg_App
             }
         }
 
-        protected override async void OnAppearing()
+        private async void OnViewStatusesClicked(object sender, EventArgs e)
         {
-            base.OnAppearing();
-            await LoadStatesAsync();
-        }
-
-        private async Task LoadStatesAsync()
-        {
-            try
-            {
-                var service = MauiProgram.Services.GetRequiredService<IDeliveryStateService>();
-                var allStates = await service.GetAllAsync();
-
-                _deliveryStates.Clear();
-                foreach (var state in allStates.OrderByDescending(s => s.DateTime).Take(10))
-                {
-                    _deliveryStates.Add(state);
-                }
-
-                StatesCollectionView.ItemsSource = _deliveryStates;
-            }
-            catch (Exception ex)
-            {
-                await DisplayAlert("Fout bij ophalen bezorgstatussen", ex.ToString(), "OK");
-            }
-        }
-
-        private async void OnPickerSelectionChanged(object sender, EventArgs e)
-        {
-            if (sender is not Picker picker || picker.BindingContext is not DeliveryState state)
-                return;
-
-            try
-            {
-                state.DateTime = DateTime.UtcNow;
-                var service = MauiProgram.Services.GetRequiredService<IDeliveryStateService>();
-                var updated = await service.UpdateAsync(state);
-                await DisplayAlert("Bijgewerkt", $"Order {updated.OrderId} staat nu op {updated.State}.", "OK");
-            }
-            catch (Exception ex)
-            {
-                await DisplayAlert("Fout bij update", ex.Message, "OK");
-            }
+            await Navigation.PushAsync(new BezorgstatussenPage());
         }
     }
 }

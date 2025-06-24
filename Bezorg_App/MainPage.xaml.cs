@@ -1,31 +1,107 @@
-﻿namespace Bezorg_App
+﻿using System;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Bezorg_App.Pages;
+using Microsoft.Extensions.Options;
+using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.Controls;
+
+namespace Bezorg_App
 {
     public partial class MainPage : ContentPage
     {
-        int count = 0;
+        private bool _isNavigating = false;
+        private static readonly System.Globalization.CultureInfo _culture = System.Globalization.CultureInfo.InvariantCulture;
 
         public MainPage()
         {
             InitializeComponent();
+            TestApiKey();
         }
 
-        private void OnCounterClicked(object sender, EventArgs e)
+        private async void TestApiKey()
         {
-            count++;
+            var settings = MauiProgram.Services.GetRequiredService<IOptions<ApiSettings>>().Value;
+            string apiKey = settings.DeliveryApiKey;
+            string url = $"http://51.137.100.120:5000/api/DeliveryServices/{apiKey}";
 
-            if (count == 1)
-                CounterBtn.Text = $"Clicked {count} time";
-            else
-                CounterBtn.Text = $"Clicked {count} times";
-
-            SemanticScreenReader.Announce(CounterBtn.Text);
+            using var httpClient = new HttpClient();
+            try
+            {
+                var response = await httpClient.GetAsync(url);
+                if (response.IsSuccessStatusCode)
+                    await DisplayAlert("API Key Test", "Success:\n" + await response.Content.ReadAsStringAsync(), "OK");
+                else
+                    await DisplayAlert("API Key Test", "Failed: " + response.StatusCode, "OK");
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("API Key Test", "Error: " + ex.Message, "OK");
+            }
         }
 
         private async void OnNavigateClicked(object sender, EventArgs e)
         {
+            if (_isNavigating) return;
+            _isNavigating = true;
+
             await Navigation.PushAsync(new BevestigBezorging());
+
+            _isNavigating = false;
         }
 
-    }
+        private async void OnLocationClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                var location = await Geolocation.GetLastKnownLocationAsync()
+                              ?? await Geolocation.GetLocationAsync(new GeolocationRequest
+                              {
+                                  DesiredAccuracy = GeolocationAccuracy.Medium,
+                                  Timeout = TimeSpan.FromSeconds(10)
+                              });
 
+                if (location != null)
+                    await DisplayAlert("GPS Locatie", $"Latitude: {location.Latitude}\nLongitude: {location.Longitude}", "OK");
+                else
+                    await DisplayAlert("Fout", "Kon locatie niet bepalen.", "OK");
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Fout", $"Er is een fout opgetreden: {ex.Message}", "OK");
+            }
+        }
+
+        private async void OnOpenInMapsClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                var location = await Geolocation.GetLastKnownLocationAsync()
+                              ?? await Geolocation.GetLocationAsync(new GeolocationRequest
+                              {
+                                  DesiredAccuracy = GeolocationAccuracy.Medium,
+                                  Timeout = TimeSpan.FromSeconds(10)
+                              });
+
+                if (location != null)
+                {
+                    var lat = location.Latitude.ToString(_culture);
+                    var lon = location.Longitude.ToString(_culture);
+                    var url = $"https://www.google.com/maps/search/?api=1&query={lat},{lon}";
+                    await Launcher.Default.OpenAsync(url);
+                }
+                else
+                    await DisplayAlert("Fout", "Kon locatie niet bepalen.", "OK");
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Fout", $"Er is een fout opgetreden: {ex.Message}", "OK");
+            }
+        }
+
+        private async void OnViewStatusesClicked(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new BezorgstatussenPage());
+        }
+    }
 }

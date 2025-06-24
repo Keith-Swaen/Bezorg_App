@@ -78,10 +78,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<MauiXaml Update="Pages\BezorgstatussenPage.xaml">
+		<MauiXaml Update="Views\BezorgstatussenPage.xaml">
 		  <Generator>MSBuild:Compile</Generator>
 		</MauiXaml>
-		<MauiXaml Update="Pages\LoginPage.xaml">
+		<MauiXaml Update="Views\LoginPage.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</MauiXaml>
 	</ItemGroup>

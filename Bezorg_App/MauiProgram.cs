@@ -31,20 +31,9 @@ namespace Bezorg_App
                    .Configure<ApiSettings>(
                        builder.Configuration.GetSection("ApiSettings"));
 
-            // ─── Registreer HttpClient & DeliveryStateService ───────────
-            builder.Services
-    .AddHttpClient<IDeliveryStateService, DeliveryStateService>((sp, client) =>
-    {
-        client.BaseAddress = new Uri("http://51.137.100.120:5000/");
-
-        var apiKey = sp
-            .GetRequiredService<IOptions<ApiSettings>>()
-            .Value
-            .DeliveryApiKey;
-
-        // apiKey als defaultheader toevoegen
-        client.DefaultRequestHeaders.Add("apiKey", apiKey);
-    });
+            // API service
+            builder.Services.AddSingleton<ApiService>();
+            builder.Services.AddSingleton<IDeliveryStateService, DeliveryStateService>();
 
             // ─── MAUI ────────────────────────────────────
             builder

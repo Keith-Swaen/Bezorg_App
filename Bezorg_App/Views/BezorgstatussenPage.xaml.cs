@@ -4,26 +4,28 @@ using System.Threading.Tasks;
 using Bezorg_App.Models;
 using Bezorg_App.Services;
 using Microsoft.Maui.Controls;
+using Bezorg_App.Models.Enums;
 
 namespace Bezorg_App.Pages
 {
     public partial class BezorgstatussenPage : ContentPage
     {
+        // Volledige lijst met bezorgstatussen en paginering
         private ObservableCollection<DeliveryState> _allStates = new();
         private const int PageSize = 5;
         private int _currentPage = 0;
 
+        // Lijst met huidige pagina's bezorgstatussen
         public ObservableCollection<DeliveryState> CurrentPageStates { get; set; } = new();
 
+        // Initaliseren overige eigenschappen en commando's
         public bool IsRefreshing { get; set; }
-
         public Command RefreshCommand { get; }
         public Command<DeliveryState> StateTappedCommand { get; }
-
         public string PageIndicator => $"Pagina {_currentPage + 1} van {TotalPages}";
-
         private int TotalPages => (_allStates.Count + PageSize - 1) / PageSize;
 
+        // Constructor
         public BezorgstatussenPage()
         {
             InitializeComponent();
@@ -74,13 +76,15 @@ namespace Bezorg_App.Pages
                 }
             });
         }
-
+           
+        // Laad de pagina met bezorgstatussen bij het openen
         protected override async void OnAppearing()
         {
             base.OnAppearing();
             await LoadStatesAsync();
         }
 
+        // Laad alle bezorgstatussen bij het openen van de pagina
         private async Task LoadStatesAsync()
         {
             try
@@ -94,10 +98,12 @@ namespace Bezorg_App.Pages
             }
             catch (Exception ex)
             {
+                Console.WriteLine($">> EXCEPTION in LoadStatesAsync: {ex}");
                 await DisplayAlert("Fout bij ophalen bezorgstatussen", ex.Message, "OK");
             }
         }
 
+        // Laad de huidige pagina met bezorgstatussen
         private void LoadCurrentPage()
         {
             CurrentPageStates.Clear();
@@ -110,6 +116,7 @@ namespace Bezorg_App.Pages
             OnPropertyChanged(nameof(PageIndicator));
         }
 
+        // Knop om naar volgende pagina te gaan
         private void OnNextPageClicked(object sender, EventArgs e)
         {
             if (_currentPage < TotalPages - 1)
@@ -119,6 +126,7 @@ namespace Bezorg_App.Pages
             }
         }
 
+        // Knop om naar vorige pagina te gaan
         private void OnPreviousPageClicked(object sender, EventArgs e)
         {
             if (_currentPage > 0)

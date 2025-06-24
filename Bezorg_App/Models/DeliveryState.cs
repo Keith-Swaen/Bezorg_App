@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Bezorg_App.Models.Enums;
 
 namespace Bezorg_App.Models
 {
-    public enum DeliveryStateEnum
-    {
-        Pending = 1,
-        InProgress = 2,
-        Completed = 3,
-        Cancelled = 4
-    }
-
     public class DeliveryState
     {
         public int Id { get; set; }
@@ -18,8 +14,5 @@ namespace Bezorg_App.Models
         public DateTime DateTime { get; set; }
         public int OrderId { get; set; }
         public int DeliveryServiceId { get; set; }
-    }
-    public class DeliveryStatesResponse : List<DeliveryState>
-    {
     }
 }

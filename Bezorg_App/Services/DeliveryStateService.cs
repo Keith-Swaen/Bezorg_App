@@ -14,9 +14,9 @@ namespace Bezorg_App.Services
     {
         private readonly HttpClient _httpClient;
 
-        public DeliveryStateService(HttpClient httpClient)
+        public DeliveryStateService(ApiService apiService)
         {
-            _httpClient = httpClient;
+            _httpClient = apiService.GetHttpClient();
         }
 
         public async Task<IList<DeliveryState>> GetAllAsync()

@@ -1,3 +1,6 @@
+﻿using Microsoft.Extensions.Logging;
+using Syncfusion.Maui.Core.Hosting; 
+using Syncfusion.Maui.SignaturePad;
 ﻿using System;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
@@ -50,7 +53,8 @@ namespace Bezorg_App
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-                });
+                })
+                .ConfigureSyncfusionCore(); // <-- Register Syncfusion here
 
 #if DEBUG
             builder.Logging.AddDebug();

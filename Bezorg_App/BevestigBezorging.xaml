@@ -1,51 +1,92 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:syncfusion="clr-namespace:Syncfusion.Maui.SignaturePad;assembly=Syncfusion.Maui.SignaturePad"
              x:Class="Bezorg_App.BevestigBezorging"
              Title="Bevestig Bezorging"
-             BackgroundColor="#F4F4F4">
+             BackgroundColor="#F9FAFB">
 
     <ScrollView>
         <VerticalStackLayout Padding="30" Spacing="25" HorizontalOptions="FillAndExpand">
 
             <Label Text="Bevestig de bezorging"
-               FontSize="24"
-               FontAttributes="Bold"
-               TextColor="#333"
-               HorizontalOptions="Center" />
+                   FontSize="26"
+                   FontAttributes="Bold"
+                   TextColor="#2C3E50"
+                   HorizontalOptions="Center" />
 
-            <Button Text="Bevestig bezorging"
-                FontSize="18"
-                BackgroundColor="#007AFF"
-                TextColor="White"
-                CornerRadius="12"
-                Padding="14"
-                HorizontalOptions="Center"
-                Clicked="OnBevestigBezorgingClicked" />
+            <!-- Handtekening -->
+            <Label Text="1. Zet uw handtekening:"
+                   FontAttributes="Bold"
+                   TextColor="#2C3E50" />
+            <syncfusion:SfSignaturePad x:Name="SignaturePad"
+                                       WidthRequest="300"
+                                       HeightRequest="200"
+                                       BackgroundColor="White"
+                                       StrokeColor="Black"
+                                       HorizontalOptions="Center" />
 
-            <Border Stroke="#CCCCCC"
-                StrokeThickness="2"
-                BackgroundColor="Transparent"
-                Padding="0"
-                HeightRequest="300"
-                WidthRequest="300"
-                IsVisible="False"
-                x:Name="PreviewImageBorder"
-                HorizontalOptions="Center">
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="20">
+                <Button x:Name="ClearSignatureButton"
+                        Text="Leegmaken"
+                        Clicked="OnClearSignatureClicked" />
+                <Button x:Name="ConfirmSignatureButton"
+                        Text="Bevestig Handtekening" 
+                        Clicked="OnConfirmSignatureClicked" />
+            </HorizontalStackLayout>
+
+            <!-- Foto -->
+            <Label x:Name="PhotoLabel"
+                   Text="2. Maak een foto van de levering:"
+                   FontAttributes="Bold"
+                   TextColor="#2C3E50"
+                   IsVisible="False" />
+            <Button x:Name="TakePhotoButton"
+                    Text="Maak Foto"
+                    Clicked="OnTakePhotoClicked"
+                    BackgroundColor="#007AFF"
+                    TextColor="White"
+                    Padding="16,12"
+                    HorizontalOptions="Center"
+                    IsVisible="False" />
+
+            <!-- Foto laten zien -->
+            <Frame x:Name="PreviewImageBorder"
+                   IsVisible="False"
+                   WidthRequest="300"
+                   HeightRequest="300"
+                   BorderColor="#D0D3D4"
+                   CornerRadius="20"
+                   Padding="0"
+                   HasShadow="True"
+                   BackgroundColor="White"
+                   HorizontalOptions="Center">
                 <Image x:Name="PreviewImage"
-                   Aspect="AspectFill"
-                   BackgroundColor="#E0E0E0" />
-            </Border>
+                       Aspect="AspectFill"
+                       BackgroundColor="#E0E0E0" />
+            </Frame>
 
+            <!-- Bevestig knop -->
+            <Button x:Name="ConfirmButton"
+                    Text="Bevestig Levering"
+                    Clicked="OnFinalConfirmClicked"
+                    IsVisible="False"
+                    BackgroundColor="Green"
+                    TextColor="White"
+                    FontAttributes="Bold"
+                    Padding="16,12"
+                    HorizontalOptions="Center" />
+
+            <!-- Bevestig -->
             <Label x:Name="ConfirmationLabel"
-               Text="Bezorging bevestigd!"
-               FontSize="20"
-               TextColor="Green"
-               FontAttributes="Bold"
-               IsVisible="False"
-               HorizontalOptions="Center" />
+                   Text="Bezorging bevestigd!"
+                   FontSize="20"
+                   TextColor="Green"
+                   FontAttributes="Bold"
+                   IsVisible="False"
+                   HorizontalOptions="Center"
+                   HorizontalTextAlignment="Center" />
 
         </VerticalStackLayout>
     </ScrollView>
-
 </ContentPage>

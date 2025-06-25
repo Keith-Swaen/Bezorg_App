@@ -2,7 +2,7 @@ using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Storage;
 using Syncfusion.Maui.SignaturePad;
 
-namespace Bezorg_App;
+namespace Bezorg_App.Views;
 
 public partial class BevestigBezorging : ContentPage
 {

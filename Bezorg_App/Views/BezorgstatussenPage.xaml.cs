@@ -6,7 +6,7 @@ using Bezorg_App.Services;
 using Microsoft.Maui.Controls;
 using Bezorg_App.Models.Enums;
 
-namespace Bezorg_App.Pages
+namespace Bezorg_App.Views
 {
     public partial class BezorgstatussenPage : ContentPage
     {

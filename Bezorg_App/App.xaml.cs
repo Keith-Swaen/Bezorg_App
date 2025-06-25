@@ -1,4 +1,6 @@
-﻿namespace Bezorg_App
+﻿using Bezorg_App.Views;
+
+namespace Bezorg_App
 {
     public partial class App : Application
     {
@@ -6,8 +8,8 @@
         {
             InitializeComponent();
 
-            // Start de app altijd met een NavigationPage
-            MainPage = new NavigationPage(new LoginPage());
+            // Start de app altijd met de LoginPage
+            MainPage = new LoginPage();
         }
     }
 }

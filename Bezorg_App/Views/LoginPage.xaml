@@ -1,6 +1,6 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Bezorg_App.LoginPage"
+             x:Class="Bezorg_App.Views.LoginPage"
              Title="Login"
              BackgroundColor="White">
 
@@ -22,6 +22,21 @@
                        TextColor="#2C3E50"
                        HorizontalOptions="Center" />
             </VerticalStackLayout>
+
+            <Frame CornerRadius="10"
+                   Padding="0"
+                   HasShadow="False"
+                   BackgroundColor="#F2F2F7"
+                   HorizontalOptions="Fill"
+                   HeightRequest="50">
+
+                <Entry x:Name="UsernameEntry"
+                       Placeholder="Gebruikersnaam"
+                       Keyboard="Text"
+                       BackgroundColor="Transparent"
+                       TextColor="#2C3E50"
+                       Margin="15,0" />
+            </Frame>
 
             <Frame CornerRadius="10"
                    Padding="0"

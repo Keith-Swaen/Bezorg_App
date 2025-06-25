@@ -2,8 +2,23 @@
 using Plugin.Fingerprint;
 using Plugin.Fingerprint.Abstractions;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using Bezorg_App.Models;
 
-namespace Bezorg_App;
+namespace Bezorg_App.Views;
+
+public static class UserStore
+{
+    public static User? CurrentUser { get; set; }
+}
+
+public class User
+{
+    public string Name { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string Functie { get; set; } = "Bezorger";
+}
 
 public partial class LoginPage : ContentPage
 {
@@ -14,18 +29,19 @@ public partial class LoginPage : ContentPage
 
     private async void OnLoginClicked(object sender, EventArgs e)
     {
+        var username = UsernameEntry.Text?.Trim();
         var password = PasswordEntry.Text?.Trim();
 
-        if (password == "admin")
+        var user = DummyUsers.Users.FirstOrDefault(u => u.Name.Equals(username, StringComparison.OrdinalIgnoreCase));
+        if (user != null && string.Equals(password, DummyUsers.DefaultPassword, StringComparison.OrdinalIgnoreCase))
         {
-            await DisplayAlert("Succes", "Inloggen gelukt!", "OK");
-
-            // Navigeer naar MainPage binnen een NavigationPage
-            Application.Current.MainPage = new NavigationPage(new MainPage());
+            UserStore.CurrentUser = user;
+            await DisplayAlert("Succes", $"Welkom {user.Name}!", "OK");
+            Application.Current.MainPage = new AppShell();
         }
         else
         {
-            ErrorLabel.Text = "Wachtwoord is incorrect.";
+            ErrorLabel.Text = "Gebruikersnaam of wachtwoord is incorrect.";
             ErrorLabel.IsVisible = true;
         }
     }
@@ -45,10 +61,10 @@ public partial class LoginPage : ContentPage
 
             if (authResult.Authenticated)
             {
+                // Log altijd in als Keith bij vingerprint
+                UserStore.CurrentUser = DummyUsers.Users.FirstOrDefault(u => u.Name == "Keith");
                 await DisplayAlert("Succes", "U bent ingelogd via vingerprint!", "OK");
-
-                // Navigeer naar MainPage binnen een NavigationPage
-                Application.Current.MainPage = new NavigationPage(new MainPage());
+                Application.Current.MainPage = new AppShell();
             }
             else
             {

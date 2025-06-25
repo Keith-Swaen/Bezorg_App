@@ -3,13 +3,23 @@
     x:Class="Bezorg_App.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:Bezorg_App"
+    xmlns:views="clr-namespace:Bezorg_App.Views"
     Shell.FlyoutBehavior="Disabled"
     Title="Bezorg_App">
 
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+    <TabBar>
+        <Tab Title="Home" Icon="home.svg">
+            <ShellContent ContentTemplate="{DataTemplate views:MainPage}" />
+        </Tab>
+        <Tab Title="Status" Icon="status.svg">
+            <ShellContent ContentTemplate="{DataTemplate views:BezorgstatussenPage}" />
+        </Tab>
+        <Tab Title="Bevestigen" Icon="checkbox.svg">
+            <ShellContent ContentTemplate="{DataTemplate views:BevestigBezorging}" />
+        </Tab>
+        <Tab Title="Account" Icon="user.svg">
+            <ShellContent ContentTemplate="{DataTemplate views:AccountPage}" />
+        </Tab>
+    </TabBar>
 
 </Shell>

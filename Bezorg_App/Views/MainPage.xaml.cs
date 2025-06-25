@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Bezorg_App.Pages;
 using Microsoft.Extensions.Options;
 using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Controls;
+using Bezorg_App.Views;
 
-namespace Bezorg_App
+namespace Bezorg_App.Views
 {
     public partial class MainPage : ContentPage
     {

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:local="clr-namespace:Bezorg_App.Pages"
-             x:Class="Bezorg_App.Pages.BezorgstatussenPage">
+             xmlns:views="clr-namespace:Bezorg_App.Views"
+             x:Class="Bezorg_App.Views.BezorgstatussenPage">
 
 
     <!-- Layout met 3 rijen: titel, hoofdinhoud en paginering -->
@@ -45,7 +45,7 @@
                             <!-- Klik-actie bij statusselectie-->
                             <Frame.GestureRecognizers>
                                 <TapGestureRecognizer
-                                    Command="{Binding Source={RelativeSource AncestorType={x:Type local:BezorgstatussenPage}}, Path=BindingContext.StateTappedCommand}"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type views:BezorgstatussenPage}}, Path=BindingContext.StateTappedCommand}"
                                     CommandParameter="{Binding}" />
                             </Frame.GestureRecognizers>
                         </Frame>

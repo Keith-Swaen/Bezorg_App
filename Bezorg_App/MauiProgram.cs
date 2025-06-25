@@ -19,23 +19,21 @@ namespace Bezorg_App
         {
             var builder = MauiApp.CreateBuilder();
 
-            // ───JSON-config ─────────────────────────────────
+            // JSON-config
             var assembly = Assembly.GetExecutingAssembly();
             using var stream = assembly
                  .GetManifestResourceStream("Bezorg_App.appsettings.json")
                              ?? throw new InvalidOperationException("Ontbrekend embedded appsettings.json");
             builder.Configuration.AddJsonStream(stream);
 
-            // ─── Bind ApiSettings ─────────────────────────────────────
-            builder.Services
-                   .Configure<ApiSettings>(
+            // Bind ApiSettings
+            builder.Services.Configure<ApiSettings>(
                        builder.Configuration.GetSection("ApiSettings"));
 
             // API service
             builder.Services.AddSingleton<ApiService>();
             builder.Services.AddSingleton<IDeliveryStateService, DeliveryStateService>();
 
-            // ─── MAUI ────────────────────────────────────
             builder
                 .UseMauiApp<App>()
                 .ConfigureFonts(fonts =>
@@ -43,17 +41,15 @@ namespace Bezorg_App
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 })
-                .ConfigureSyncfusionCore(); // <-- Register Syncfusion here
+                .ConfigureSyncfusionCore();
 
 #if DEBUG
             builder.Logging.AddDebug();
 #endif
 
-            // ─── Build en sla ServiceProvider op ───────────────────────
+            // Build en sla ServiceProvider op
             var app = builder.Build();
             Services = app.Services;
-
-            // ─── Return de opgebouwde app ──────────────────────────────
             return app;
         }
     }

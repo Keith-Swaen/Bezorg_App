@@ -23,7 +23,7 @@ namespace Bezorg_App.Views
         {
             var settings = MauiProgram.Services.GetRequiredService<IOptions<ApiSettings>>().Value;
             string apiKey = settings.DeliveryApiKey;
-            string url = $"http://51.137.100.120:5000/api/DeliveryServices/{apiKey}";
+            string url = $"http://192.168.178.17:5111/api/DeliveryServices";
 
             using var httpClient = new HttpClient();
             try

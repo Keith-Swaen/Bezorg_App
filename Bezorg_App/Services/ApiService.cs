@@ -21,7 +21,7 @@ namespace Bezorg_App.Services
             // Initialiseer de HttpClient met de basis-URL van de API
             _httpClient = new HttpClient
             {
-                BaseAddress = new Uri("http://51.137.100.120:5000/")
+                BaseAddress = new Uri("http://192.168.178.17:5111/") // plaats hier je eigen ip
             };
 
             _httpClient.DefaultRequestHeaders.Add("apiKey", settings.DeliveryApiKey);

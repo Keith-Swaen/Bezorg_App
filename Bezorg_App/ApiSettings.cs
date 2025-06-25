@@ -8,6 +8,7 @@ namespace Bezorg_App
 {
     public class ApiSettings
     {
-        public string DeliveryApiKey { get; set; } = string.Empty;
+        public string DeliveryApiKey { get; set; } = default!;
+        public string ApiBaseUrl { get; set; } = default!;
     }
 }

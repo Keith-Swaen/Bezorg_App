@@ -22,8 +22,8 @@ namespace Bezorg_App.Views
         private async void TestApiKey()
         {
             var settings = MauiProgram.Services.GetRequiredService<IOptions<ApiSettings>>().Value;
-            string apiKey = settings.DeliveryApiKey;
-            string url = $"http://192.168.178.17:5111/api/DeliveryServices";
+            string apiBaseUrl = settings.ApiBaseUrl;
+            string url = $"{apiBaseUrl}api/DeliveryServices";
 
             using var httpClient = new HttpClient();
             try

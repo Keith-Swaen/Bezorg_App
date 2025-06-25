@@ -17,11 +17,11 @@ namespace Bezorg_App.Services
         public ApiService(IOptions<ApiSettings> options)
         {
             var settings = options.Value;
-
+            string apiBaseUrl = settings.ApiBaseUrl;
             // Initialiseer de HttpClient met de basis-URL van de API
             _httpClient = new HttpClient
             {
-                BaseAddress = new Uri("http://192.168.178.17:5111/") // plaats hier je eigen ip
+                BaseAddress = new Uri(apiBaseUrl) // plaats hier je eigen ip
             };
 
             _httpClient.DefaultRequestHeaders.Add("apiKey", settings.DeliveryApiKey);

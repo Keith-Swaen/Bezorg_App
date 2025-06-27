@@ -11,6 +11,6 @@ Connectie met API starten:
 2.1 Start applicatie met http
 
 3. Open Bezorg_App
-3.1 Pas bij appsettings.json de ApiBaseUrl aan naar "http://(JOUW IPv4):5111"
+3.1 Pas bij appsettings.json de ApiBaseUrl aan naar "http://(JOUW IPv4):5111" // zonder ()
 3.2 Ga naar Bezorg_App/Platforms/Android/xml/network_security_config.xml en schrijf bij
 		<domain includeSubdomains="true">IPv4</domain> // schrijf bij IPv4 jouw eigen IPv4

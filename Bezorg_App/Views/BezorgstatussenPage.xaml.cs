@@ -5,6 +5,7 @@ using Bezorg_App.Models;
 using Bezorg_App.Services;
 using Microsoft.Maui.Controls;
 using Bezorg_App.Models.Enums;
+using Microsoft.Maui.ApplicationModel;
 
 namespace Bezorg_App.Views
 {
@@ -22,6 +23,7 @@ namespace Bezorg_App.Views
         public bool IsRefreshing { get; set; }
         public Command RefreshCommand { get; }
         public Command<DeliveryState> StateTappedCommand { get; }
+        public Command<string> AddressTappedCommand { get; }
         public string PageIndicator => $"Pagina {_currentPage + 1} van {TotalPages}";
         private int TotalPages => (_allStates.Count + PageSize - 1) / PageSize;
 
@@ -41,26 +43,41 @@ namespace Bezorg_App.Views
             StateTappedCommand = new Command<DeliveryState>(async (state) =>
             {
                 string actie = await DisplayActionSheet($"Update status voor Order {state.OrderId}", "Annuleer", null,
-                    "In afwachting", "Onderweg", "Afgeleverd", "Geannuleerd");
+                    "In Afwachting", "Onderweg", "Geleverd", "Geannuleerd");
 
                 if (actie is null or "Annuleer")
                     return;
 
-                state.State = actie switch
-                {
-                    "In afwachting" => DeliveryStateEnum.Pending,
-                    "Onderweg" => DeliveryStateEnum.InProgress,
-                    "Afgeleverd" => DeliveryStateEnum.Completed,
-                    "Geannuleerd" => DeliveryStateEnum.Cancelled,
-                    _ => state.State
-                };
-
-                state.DateTime = DateTime.UtcNow;
-
                 try
                 {
                     var service = MauiProgram.Services.GetRequiredService<IDeliveryStateService>();
-                    var updated = await service.UpdateAsync(state);
+                    DeliveryState updated;
+
+                    switch (actie)
+                    {
+                        case "In Afwachting":
+                            state.State = DeliveryStateEnum.InAfwachting;
+                            state.DateTime = DateTime.UtcNow;
+                            updated = await service.UpdateAsync(state);
+                            break;
+                        case "Onderweg":
+                            state.State = DeliveryStateEnum.Onderweg;
+                            state.DateTime = DateTime.UtcNow;
+                            updated = await service.UpdateAsync(state);
+                            break;
+                        case "Geleverd":
+                            state.State = DeliveryStateEnum.Geleverd;
+                            state.DateTime = DateTime.UtcNow;
+                            updated = await service.UpdateAsync(state);
+                            break;
+                        case "Geannuleerd":
+                            state.State = DeliveryStateEnum.Geannuleerd;
+                            state.DateTime = DateTime.UtcNow;
+                            updated = await service.UpdateAsync(state);
+                            break;
+                        default:
+                            return;
+                    }
 
                     // Update lokaal
                     int index = _allStates.IndexOf(state);
@@ -73,6 +90,29 @@ namespace Bezorg_App.Views
                 catch (Exception ex)
                 {
                     await DisplayAlert("Fout bij update", ex.Message, "OK");
+                }
+            });
+
+            AddressTappedCommand = new Command<string>(async (address) =>
+            {
+                if (string.IsNullOrWhiteSpace(address))
+                {
+                    await DisplayAlert("Fout", "Geen adres beschikbaar", "OK");
+                    return;
+                }
+
+                try
+                {
+                    // Maak een Google Maps URL met het adres
+                    var encodedAddress = Uri.EscapeDataString(address);
+                    var mapsUrl = $"https://maps.google.com/maps?q={encodedAddress}";
+                    
+                    // Open Google Maps
+                    await Launcher.OpenAsync(new Uri(mapsUrl));
+                }
+                catch (Exception ex)
+                {
+                    await DisplayAlert("Fout", $"Kon Google Maps niet openen: {ex.Message}", "OK");
                 }
             });
         }

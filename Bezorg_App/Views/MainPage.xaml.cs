@@ -23,7 +23,7 @@ namespace Bezorg_App.Views
         {
             var settings = MauiProgram.Services.GetRequiredService<IOptions<ApiSettings>>().Value;
             string apiBaseUrl = settings.ApiBaseUrl;
-            string url = $"{apiBaseUrl}api/DeliveryServices";
+            string url = $"{apiBaseUrl}/api/DeliveryServices";
 
             using var httpClient = new HttpClient();
             try

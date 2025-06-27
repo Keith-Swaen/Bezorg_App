@@ -6,7 +6,12 @@
 
 
     <!-- Layout met 3 rijen: titel, hoofdinhoud en paginering -->
-    <Grid RowDefinitions="Auto,*,Auto" Padding="20">
+    <Grid Padding="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
         <!-- Pagina titel -->
         <Label Text="Bezorgstatussen"
@@ -27,19 +32,56 @@
                 
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <Frame Padding="10"
-                               Margin="0,5"
-                               CornerRadius="5"
-                               BorderColor="LightGray"
-                               HeightRequest="100">
+                        <Frame Padding="15"
+                               Margin="0,8"
+                               CornerRadius="8"
+                               BorderColor="LightGray">
                             
-                            <VerticalStackLayout VerticalOptions="FillAndExpand">
-                                <Label Text="{Binding Id, StringFormat='ID: {0}'}"
-                                       FontSize="14" />
-                                <Label Text="{Binding State}" FontSize="16"
-                                       FontAttributes="Bold" />
-                                <Label Text="{Binding DateTime, StringFormat='Datum: {0:dd-MM-yyyy HH:mm}'}"
-                                       FontSize="12" />
+                            <VerticalStackLayout VerticalOptions="FillAndExpand" Spacing="8">
+                                <!-- Order en Customer informatie -->
+                                <HorizontalStackLayout Spacing="10">
+                                    <VerticalStackLayout VerticalOptions="Start" HorizontalOptions="StartAndExpand">
+                                        <Label Text="{Binding OrderId, StringFormat='Order ID: {0}'}"
+                                               FontSize="14" 
+                                               FontAttributes="Bold"
+                                               TextColor="DarkBlue" />
+                                        <Label Text="{Binding Order.Customer.Name, StringFormat='Klant: {0}'}"
+                                               FontSize="16"
+                                               FontAttributes="Bold"
+                                               TextColor="DarkGreen" />
+                                        <Label Text="{Binding Order.Customer.Address, StringFormat='Adres: {0}'}"
+                                               FontSize="14"
+                                               TextColor="Blue"
+                                               TextDecorations="Underline">
+                                            <Label.GestureRecognizers>
+                                                <TapGestureRecognizer
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type views:BezorgstatussenPage}}, Path=BindingContext.AddressTappedCommand}"
+                                                    CommandParameter="{Binding Order.Customer.Address}" />
+                                            </Label.GestureRecognizers>
+                                        </Label>
+                                    </VerticalStackLayout>
+                                    
+                                    <VerticalStackLayout VerticalOptions="Start" HorizontalOptions="End">
+                                        <Frame Padding="8,4" 
+                                               CornerRadius="12" 
+                                               BackgroundColor="Orange"
+                                               HorizontalOptions="End">
+                                            <Label Text="{Binding State}" 
+                                                   FontSize="14"
+                                                   FontAttributes="Bold"
+                                                   TextColor="White" />
+                                        </Frame>
+                                        <Label Text="{Binding DateTime, StringFormat='{0:dd-MM-yyyy HH:mm}'}"
+                                               FontSize="12"
+                                               TextColor="Gray"
+                                               HorizontalOptions="End" />
+                                    </VerticalStackLayout>
+                                </HorizontalStackLayout>
+                                
+                                <!-- Delivery Service informatie (indien beschikbaar) -->
+                                <Label Text="{Binding DeliveryService.Name, StringFormat='Bezorgdienst: {0}'}"
+                                       FontSize="12"
+                                       TextColor="Purple" />
                             </VerticalStackLayout>
                             
                             <!-- Klik-actie bij statusselectie-->

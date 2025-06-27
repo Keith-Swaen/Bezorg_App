@@ -8,9 +8,9 @@ namespace Bezorg_App.Models.Enums
 {
     public enum DeliveryStateEnum
     {
-        Pending = 1,
-        InProgress = 2,
-        Completed = 3,
-        Cancelled = 4
+        InAfwachting = 1,
+        Onderweg = 2,
+        Geleverd = 3,
+        Geannuleerd = 4,
     }
 }

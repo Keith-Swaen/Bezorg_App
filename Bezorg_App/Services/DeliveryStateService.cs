@@ -4,6 +4,8 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Bezorg_App.Models;
+using Bezorg_App.Models.Enums;
+using Microsoft.Extensions.Options;
 
 namespace Bezorg_App.Services
 {
@@ -21,54 +23,53 @@ namespace Bezorg_App.Services
 
         public async Task<IList<DeliveryState>> GetAllAsync()
         {
-            var requestUri = "api/DeliveryStates/GetAllDeliveryStates";
-            HttpResponseMessage response;
+            var apiService = new ApiService(MauiProgram.Services.GetRequiredService<IOptions<ApiSettings>>());
+            var allDeliveryStates = new List<DeliveryState>();
 
             try
             {
-                response = await _httpClient.GetAsync(requestUri);
+                // Probeer customer 1 op te halen
+                var customerId = 1;
+                var customerOrdersResponse = await apiService.GetCustomerOrdersWithStatusAsync(customerId);
+                
+                if (customerOrdersResponse.OrdersWithStatus != null)
+                {
+                    foreach (var orderWithStatus in customerOrdersResponse.OrdersWithStatus)
+                    {
+                        if (orderWithStatus.DeliveryHistory != null)
+                        {
+                            allDeliveryStates.AddRange(orderWithStatus.DeliveryHistory);
+                        }
+                    }
+                }
             }
-            catch (Exception httpEx)
+            catch (Exception ex)
             {
-                throw new ApplicationException(
-                    $"Netwerkfout bij GET {requestUri}: {httpEx.Message}", httpEx);
+                Console.WriteLine($"Fout bij ophalen delivery states: {ex.Message}");
             }
 
-            if (!response.IsSuccessStatusCode)
-            {
-                var body = await response.Content.ReadAsStringAsync();
-                throw new ApplicationException(
-                    $"API gaf status {(int)response.StatusCode} ({response.StatusCode}). Body:\n{body}");
-            }
-
-            try
-            {
-                var result = await response.Content
-                                           .ReadFromJsonAsync<IList<DeliveryState>>();
-                return result ?? Array.Empty<DeliveryState>();
-            }
-            catch (Exception jsonEx)
-            {
-                var raw = await response.Content.ReadAsStringAsync();
-                throw new ApplicationException(
-                    $"Kon JSON niet deserialiseren:\n{jsonEx.Message}\nRAW:\n{raw}", jsonEx);
-            }
+            return allDeliveryStates;
         }
 
         public async Task<DeliveryState> UpdateAsync(DeliveryState state)
         {
-            // Endpoint uit swagger: POST /api/DeliveryStates/UpdateDeliveryState
             HttpResponseMessage response;
             try
             {
-                response = await _httpClient.PostAsJsonAsync(
-                    "api/DeliveryStates/UpdateDeliveryState",
-                    state);
+                var updateRequest = new UpdateDeliveryStateRequest
+                {
+                    State = state.State,
+                    DeliveryServiceId = state.DeliveryServiceId
+                };
+
+                response = await _httpClient.PutAsJsonAsync(
+                    $"api/DeliveryStates/{state.Id}",
+                    updateRequest);
             }
             catch (Exception httpEx)
             {
                 throw new ApplicationException(
-                    $"Netwerkfout bij POST UpdateDeliveryState: {httpEx.Message}", httpEx);
+                    $"Netwerkfout bij PUT UpdateDeliveryState: {httpEx.Message}", httpEx);
             }
 
             if (!response.IsSuccessStatusCode)

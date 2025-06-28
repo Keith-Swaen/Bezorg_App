@@ -1,183 +1,205 @@
-//using Windows.UI.Notifications;
-
+using System;
 using System.Timers;
+using Microsoft.Maui.Controls;
+using Microsoft.Maui.Storage;
 
-namespace Bezorg_App.Views;
-
-public partial class KloktijdenPage : ContentPage
+namespace Bezorg_App.Views
 {
-    private bool _isClockedIn;
-    private bool _isOnBreak;
-    private DateTime _clockInTime;
-    private DateTime? _breakStartTime;
-    private TimeSpan _totalWorkTime;
-    private TimeSpan _totalBreakTime;
-    private System.Timers.Timer _workTimeTimer;
-
-    public KloktijdenPage()
+    public partial class KloktijdenPage : ContentPage
     {
-        InitializeComponent();
-        LoadState();
-        UpdateStatus();
-        StartWorkTimeTimer();
-    }
+        private bool _isClockedIn;
+        private bool _isOnBreak;
+        private DateTime _clockInTime;
+        private DateTime? _breakStartTime;
+        private TimeSpan _currentSessionWorkTime;
+        private TimeSpan _allTimeWorkTime;
+        private TimeSpan _totalBreakTime;
+        private TimeSpan _lastWorkTime;
+        private DateTime _lastWorkTimeStart;
+        private System.Timers.Timer _workTimeTimer;
 
-    private void LoadState()
-    {
-        _isClockedIn = Preferences.Get("IsClockedIn", false);
-        _isOnBreak = Preferences.Get("IsOnBreak", false);
-        _totalWorkTime = TimeSpan.Parse(Preferences.Get("TotalWorkTime", "00:00:00"));
-        _totalBreakTime = TimeSpan.Parse(Preferences.Get("TotalBreakTime", "00:00:00"));
-        if (_isClockedIn)
+        public KloktijdenPage()
         {
-            _clockInTime = DateTime.Parse(Preferences.Get("ClockInTime", DateTime.Now.ToString()));
-        }
-        if (_isOnBreak)
-        {
-            _breakStartTime = DateTime.Parse(Preferences.Get("BreakStartTime", DateTime.Now.ToString()));
-        }
-    }
-
-    private void UpdateStatus()
-    {
-        ClockInButton.IsEnabled = !_isClockedIn;
-        ClockOutButton.IsEnabled = _isClockedIn && !_isOnBreak;
-        StartBreakButton.IsEnabled = _isClockedIn && !_isOnBreak;
-        EndBreakButton.IsEnabled = _isOnBreak;
-
-        if (_isOnBreak)
-        {
-            StatusLabel.Text = $"Op pauze sinds {_breakStartTime?.ToString("HH:mm:ss")}";
-        }
-        else if (_isClockedIn)
-        {
-            StatusLabel.Text = $"Ingeklokt sinds {_clockInTime.ToString("HH:mm:ss")}";
-        }
-        else
-        {
-            StatusLabel.Text = "Nog niet ingeklokt";
-        }
-
-        UpdateWorkTime();
-        UpdateBreakTime();
-    }
-
-    private void StartWorkTimeTimer()
-    {
-        _workTimeTimer = new System.Timers.Timer(1000); // Update elke seconde
-        _workTimeTimer.Elapsed += WorkTimeTimerElapsed;
-        if (_isClockedIn && !_isOnBreak)
-        {
-            _workTimeTimer.Start();
-        }
-    }
-
-    private void WorkTimeTimerElapsed(object sender, ElapsedEventArgs e)
-    {
-        MainThread.BeginInvokeOnMainThread(() =>
-        {
-            UpdateWorkTime();
-            UpdateBreakTime();
-        });
-    }
-
-    private void UpdateWorkTime()
-    {
-        if (_isClockedIn && !_isOnBreak)
-        {
-            var currentSessionTime = DateTime.Now - _clockInTime;
-            WorkTimeLabel.Text = $"Gewerkt: {currentSessionTime.Hours} uur {currentSessionTime.Minutes} minuten";
-        }
-        else
-        {
-            WorkTimeLabel.Text = $"Gewerkt: {_totalWorkTime.Hours} uur {_totalWorkTime.Minutes} minuten";
-        }
-    }
-
-    private void UpdateBreakTime()
-    {
-        if (_isOnBreak)
-        {
-            var currentBreakTime = DateTime.Now - _breakStartTime ?? TimeSpan.Zero;
-            BreakTimeLabel.Text = $"Pauze: {_totalBreakTime.Hours + currentBreakTime.Hours} uur {_totalBreakTime.Minutes + currentBreakTime.Minutes} minuten";
-        }
-        else
-        {
-            BreakTimeLabel.Text = $"Pauze: {_totalBreakTime.Hours} uur {_totalBreakTime.Minutes} minuten";
-        }
-    }
-
-    private async void OnClockInClicked(object sender, EventArgs e)
-    {
-        if (!_isClockedIn)
-        {
-            _isClockedIn = true;
-            _clockInTime = DateTime.Now;
-            Preferences.Set("IsClockedIn", true);
-            Preferences.Set("ClockInTime", _clockInTime.ToString());
-            _workTimeTimer.Start();
+            InitializeComponent();
+            LoadState();
             UpdateStatus();
-            await DisplayAlert("Succes", "Je bent ingeklokt!", "OK");
+            StartWorkTimeTimer();
         }
-    }
 
-    private async void OnClockOutClicked(object sender, EventArgs e)
-    {
-        if (_isClockedIn && !_isOnBreak)
+        private void LoadState()
         {
-            var currentSessionTime = DateTime.Now - _clockInTime;
-            _totalWorkTime += currentSessionTime;
-            Preferences.Set("TotalWorkTime", _totalWorkTime.ToString());
-            _isClockedIn = false;
-            Preferences.Set("IsClockedIn", false);
-            Preferences.Remove("ClockInTime");
-            _workTimeTimer.Stop();
-            UpdateStatus();
-            await DisplayAlert("Succes", "Je bent uitgeklokt!", "OK");
-        }
-    }
-
-    private async void OnStartBreakClicked(object sender, EventArgs e)
-    {
-        if (_isClockedIn && !_isOnBreak)
-        {
-            if (int.TryParse(BreakDurationEntry.Text, out int breakMinutes) && breakMinutes > 0)
+            _isClockedIn = Preferences.Get("IsClockedIn", false);
+            _isOnBreak = Preferences.Get("IsOnBreak", false);
+            _currentSessionWorkTime = TimeSpan.Zero; // Huidige sessie start op 0
+            _allTimeWorkTime = TimeSpan.Parse(Preferences.Get("AllTimeWorkTime", "00:00:00"));
+            _totalBreakTime = TimeSpan.Parse(Preferences.Get("TotalBreakTime", "00:00:00"));
+            _lastWorkTime = TimeSpan.Zero;
+            if (_isClockedIn)
             {
-                _isOnBreak = true;
-                _breakStartTime = DateTime.Now;
-                Preferences.Set("IsOnBreak", true);
-                Preferences.Set("BreakStartTime", _breakStartTime.ToString());
-                _workTimeTimer.Stop();
-                UpdateStatus();
-                await DisplayAlert("Succes", $"Pauze gestart voor {breakMinutes} minuten.", "OK");
+                _clockInTime = DateTime.Parse(Preferences.Get("ClockInTime", DateTime.Now.ToString()));
+                _lastWorkTimeStart = _clockInTime;
+                if (!_isOnBreak)
+                {
+                    _currentSessionWorkTime = DateTime.Now - _clockInTime; // Herstel sessietijd bij laden
+                }
+            }
+            if (_isOnBreak)
+            {
+                _breakStartTime = DateTime.Parse(Preferences.Get("BreakStartTime", DateTime.Now.ToString()));
+            }
+        }
+
+        private void UpdateStatus()
+        {
+            ClockInButton.IsEnabled = !_isClockedIn;
+            ClockOutButton.IsEnabled = _isClockedIn && !_isOnBreak;
+            StartBreakButton.IsEnabled = _isClockedIn && !_isOnBreak;
+            EndBreakButton.IsEnabled = _isOnBreak;
+
+            if (_isOnBreak)
+            {
+                StatusLabel.Text = $"Op pauze sinds {_breakStartTime?.ToString("HH:mm:ss")}";
+            }
+            else if (_isClockedIn)
+            {
+                StatusLabel.Text = $"Ingeklokt sinds {_clockInTime.ToString("HH:mm:ss")}";
             }
             else
             {
-                await DisplayAlert("Fout", "Voer een geldige pauzetijd in (in minuten).", "OK");
+                StatusLabel.Text = "Nog niet ingeklokt";
+            }
+
+            UpdateWorkTime();
+            UpdateBreakTime();
+        }
+
+        private void StartWorkTimeTimer()
+        {
+            _workTimeTimer = new System.Timers.Timer(1000); // Update elke seconde
+            _workTimeTimer.Elapsed += WorkTimeTimerElapsed;
+            if (_isClockedIn)
+            {
+                _workTimeTimer.Start(); // Timer blijft aan, ook tijdens pauze, om pauzetijd te updaten
             }
         }
-    }
 
-    private async void OnEndBreakClicked(object sender, EventArgs e)
-    {
-        if (_isOnBreak)
+        private void WorkTimeTimerElapsed(object sender, ElapsedEventArgs e)
         {
-            var breakDuration = DateTime.Now - _breakStartTime ?? TimeSpan.Zero;
-            _totalBreakTime += breakDuration;
-            Preferences.Set("TotalBreakTime", _totalBreakTime.ToString());
-            _isOnBreak = false;
-            Preferences.Set("IsOnBreak", false);
-            Preferences.Remove("BreakStartTime");
-            _workTimeTimer.Start();
-            UpdateStatus();
-            await DisplayAlert("Succes", "Pauze gestopt!", "OK");
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                UpdateWorkTime();
+                UpdateBreakTime();
+            });
         }
-    }
 
-    protected override void OnDisappearing()
-    {
-        base.OnDisappearing();
-        _workTimeTimer?.Stop();
-        _workTimeTimer?.Dispose();
+        private void UpdateWorkTime()
+        {
+            if (_isClockedIn && !_isOnBreak)
+            {
+                _currentSessionWorkTime = _lastWorkTime + (DateTime.Now - _lastWorkTimeStart);
+                WorkTimeLabel.Text = $"Huidige werktijd: {_currentSessionWorkTime.Hours} uur {_currentSessionWorkTime.Minutes} minuten ({_currentSessionWorkTime.Seconds})";
+            }
+            else
+            {
+                WorkTimeLabel.Text = $"Huidige werktijd: {_currentSessionWorkTime.Hours} uur {_currentSessionWorkTime.Minutes} minuten ({_currentSessionWorkTime.Seconds})";
+            }
+        }
+
+        private void UpdateBreakTime()
+        {
+            if (_isOnBreak)
+            {
+                var currentBreakTime = DateTime.Now - _breakStartTime ?? TimeSpan.Zero;
+                BreakTimeLabel.Text = $"Pauze: {_totalBreakTime.Hours + currentBreakTime.Hours} uur {_totalBreakTime.Minutes + currentBreakTime.Minutes} minuten  ({_totalBreakTime.Seconds})";
+            }
+            else
+            {
+                BreakTimeLabel.Text = $"Pauze: {_totalBreakTime.Hours} uur {_totalBreakTime.Minutes} minuten";
+            }
+        }
+
+        private async void OnClockInClicked(object sender, EventArgs e)
+        {
+            if (!_isClockedIn)
+            {
+                _isClockedIn = true;
+                _clockInTime = DateTime.Now;
+                _lastWorkTimeStart = _clockInTime;
+                _currentSessionWorkTime = TimeSpan.Zero;
+                _lastWorkTime = TimeSpan.Zero;
+                Preferences.Set("IsClockedIn", true);
+                Preferences.Set("ClockInTime", _clockInTime.ToString());
+                _workTimeTimer.Start();
+                UpdateStatus();
+                await DisplayAlert("Succes", "Je bent ingeklokt!", "OK");
+            }
+        }
+
+        private async void OnClockOutClicked(object sender, EventArgs e)
+        {
+            if (_isClockedIn && !_isOnBreak)
+            {
+                bool confirm = await DisplayAlert("Bevestiging", "Weet je zeker dat je wilt stoppen met werken? De tijd wordt toegevoegd aan je totale werktijd.", "Ja", "Nee");
+                if (confirm)
+                {
+                    _allTimeWorkTime += _currentSessionWorkTime;
+                    Preferences.Set("AllTimeWorkTime", _allTimeWorkTime.ToString());
+                    _currentSessionWorkTime = TimeSpan.Zero;
+                    _totalBreakTime = TimeSpan.Zero;
+                    _lastWorkTime = TimeSpan.Zero;
+                    Preferences.Set("TotalBreakTime", _totalBreakTime.ToString());
+                    _isClockedIn = false;
+                    Preferences.Set("IsClockedIn", false);
+                    Preferences.Remove("ClockInTime");
+                    _workTimeTimer.Stop();
+                    UpdateStatus();
+                    await DisplayAlert("Succes", "Je bent uitgeklokt!", "OK");
+                }
+            }
+        }
+
+        private async void OnStartBreakClicked(object sender, EventArgs e)
+        {
+            if (_isClockedIn && !_isOnBreak)
+            {
+                if (int.TryParse(BreakDurationEntry.Text, out int breakMinutes) && breakMinutes > 0)
+                {
+                    _isOnBreak = true;
+                    _breakStartTime = DateTime.Now;
+                    _lastWorkTime = _currentSessionWorkTime; // Bewaar huidige werktijd
+                    Preferences.Set("IsOnBreak", true);
+                    Preferences.Set("BreakStartTime", _breakStartTime.ToString());
+                    UpdateStatus();
+                    await DisplayAlert("Succes", $"Pauze gestart voor {breakMinutes} minuten.", "OK");
+                }
+                else
+                {
+                    await DisplayAlert("Fout", "Voer een geldige pauzetijd in (in minuten).", "OK");
+                }
+            }
+        }
+
+        private async void OnEndBreakClicked(object sender, EventArgs e)
+        {
+            if (_isOnBreak)
+            {
+                var breakDuration = DateTime.Now - _breakStartTime ?? TimeSpan.Zero;
+                _totalBreakTime += breakDuration;
+                Preferences.Set("TotalBreakTime", _totalBreakTime.ToString());
+                _isOnBreak = false;
+                Preferences.Set("IsOnBreak", false);
+                Preferences.Remove("BreakStartTime");
+                _lastWorkTimeStart = DateTime.Now; // Start nieuwe werksessie zonder pauzetijd mee te tellen
+                UpdateStatus();
+                await DisplayAlert("Succes", "Pauze gestopt!", "OK");
+            }
+        }
+
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+            _workTimeTimer?.Stop();
+            _workTimeTimer?.Dispose();
+        }
     }
 }

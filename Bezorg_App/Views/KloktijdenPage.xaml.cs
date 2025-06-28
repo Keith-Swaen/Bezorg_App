@@ -17,6 +17,7 @@ namespace Bezorg_App.Views
         private TimeSpan _lastWorkTime;
         private DateTime _lastWorkTimeStart;
         private System.Timers.Timer _workTimeTimer;
+        private System.Timers.Timer _breakReminderTimer;
 
         public KloktijdenPage()
         {
@@ -121,7 +122,13 @@ namespace Bezorg_App.Views
 
             BreakTimeLabel.Text = $"Pauze: {totalBreak.Hours} uur {totalBreak.Minutes} minuten ({totalBreak.Seconds})";
         }
-
+        private void BreakReminderElapsed(object sender, ElapsedEventArgs e)
+        {
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                await Shell.Current.DisplayAlert("Pauze afgelopen", "Je ingevoerde pauze is voorbij. Vergeet niet om de pauzen te stoppen en weer aan het werk te gaan!", "OK");
+            });
+        }
 
         private async void OnClockInClicked(object sender, EventArgs e)
         {
@@ -175,6 +182,13 @@ namespace Bezorg_App.Views
                     Preferences.Set("IsOnBreak", true);
                     Preferences.Set("BreakStartTime", _breakStartTime.ToString());
                     UpdateStatus();
+
+                    // Start de pauze timer voor een herrnnering
+                    _breakReminderTimer = new System.Timers.Timer(breakMinutes * 1000 * 60); // pauzeduur in ms
+                    _breakReminderTimer.Elapsed += BreakReminderElapsed;
+                    _breakReminderTimer.AutoReset = false;
+                    _breakReminderTimer.Start();
+
                     await DisplayAlert("Succes", $"Pauze gestart voor {breakMinutes} minuten.", "OK");
                 }
                 else

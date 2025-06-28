@@ -17,6 +17,9 @@
         <Tab Title="Bevestigen" Icon="checkbox.svg">
             <ShellContent ContentTemplate="{DataTemplate views:BevestigBezorging}" />
         </Tab>
+        <Tab Title="Kloktijden" Icon="time.svg">
+            <ShellContent ContentTemplate="{DataTemplate views:KloktijdenPage}" />
+        </Tab>
         <Tab Title="Account" Icon="user.svg">
             <ShellContent ContentTemplate="{DataTemplate views:AccountPage}" />
         </Tab>

@@ -38,7 +38,7 @@
                 HorizontalOptions="Fill"
                 HeightRequest="50" />
             <Button
-                Text="Kloktijden"
+                Text="Werktijd Klokken"
                 Clicked="OnKloktijdenClicked"
                 HorizontalOptions="Fill"
                 HeightRequest="50" />   

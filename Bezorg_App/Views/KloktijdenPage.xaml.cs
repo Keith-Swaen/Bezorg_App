@@ -11,6 +11,7 @@ public partial class KloktijdenPage : ContentPage
     private DateTime _clockInTime;
     private DateTime? _breakStartTime;
     private TimeSpan _totalWorkTime;
+    private TimeSpan _totalBreakTime;
     private System.Timers.Timer _workTimeTimer;
 
     public KloktijdenPage()
@@ -26,6 +27,7 @@ public partial class KloktijdenPage : ContentPage
         _isClockedIn = Preferences.Get("IsClockedIn", false);
         _isOnBreak = Preferences.Get("IsOnBreak", false);
         _totalWorkTime = TimeSpan.Parse(Preferences.Get("TotalWorkTime", "00:00:00"));
+        _totalBreakTime = TimeSpan.Parse(Preferences.Get("TotalBreakTime", "00:00:00"));
         if (_isClockedIn)
         {
             _clockInTime = DateTime.Parse(Preferences.Get("ClockInTime", DateTime.Now.ToString()));
@@ -57,6 +59,7 @@ public partial class KloktijdenPage : ContentPage
         }
 
         UpdateWorkTime();
+        UpdateBreakTime();
     }
 
     private void StartWorkTimeTimer()
@@ -71,7 +74,11 @@ public partial class KloktijdenPage : ContentPage
 
     private void WorkTimeTimerElapsed(object sender, ElapsedEventArgs e)
     {
-        MainThread.BeginInvokeOnMainThread(UpdateWorkTime);
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            UpdateWorkTime();
+            UpdateBreakTime();
+        });
     }
 
     private void UpdateWorkTime()
@@ -79,12 +86,24 @@ public partial class KloktijdenPage : ContentPage
         if (_isClockedIn && !_isOnBreak)
         {
             var currentSessionTime = DateTime.Now - _clockInTime;
-            var totalTime = _totalWorkTime + currentSessionTime;
-            WorkTimeLabel.Text = $"Gewerkt: {totalTime.Hours} uur {totalTime.Minutes} minuten";
+            WorkTimeLabel.Text = $"Gewerkt: {currentSessionTime.Hours} uur {currentSessionTime.Minutes} minuten";
         }
         else
         {
             WorkTimeLabel.Text = $"Gewerkt: {_totalWorkTime.Hours} uur {_totalWorkTime.Minutes} minuten";
+        }
+    }
+
+    private void UpdateBreakTime()
+    {
+        if (_isOnBreak)
+        {
+            var currentBreakTime = DateTime.Now - _breakStartTime ?? TimeSpan.Zero;
+            BreakTimeLabel.Text = $"Pauze: {_totalBreakTime.Hours + currentBreakTime.Hours} uur {_totalBreakTime.Minutes + currentBreakTime.Minutes} minuten";
+        }
+        else
+        {
+            BreakTimeLabel.Text = $"Pauze: {_totalBreakTime.Hours} uur {_totalBreakTime.Minutes} minuten";
         }
     }
 
@@ -123,21 +142,16 @@ public partial class KloktijdenPage : ContentPage
         if (_isClockedIn && !_isOnBreak)
         {
             if (int.TryParse(BreakDurationEntry.Text, out int breakMinutes) && breakMinutes > 0)
-                {
-                var currentSessionTime = DateTime.Now - _clockInTime;
-                _totalWorkTime += currentSessionTime;
-                Preferences.Set("TotalWorkTime", _totalWorkTime.ToString());
+            {
                 _isOnBreak = true;
                 _breakStartTime = DateTime.Now;
-                _clockInTime = DateTime.Now; // Reset voor na de pauze
                 Preferences.Set("IsOnBreak", true);
                 Preferences.Set("BreakStartTime", _breakStartTime.ToString());
-                Preferences.Set("ClockInTime", _clockInTime.ToString());
                 _workTimeTimer.Stop();
                 UpdateStatus();
                 await DisplayAlert("Succes", $"Pauze gestart voor {breakMinutes} minuten.", "OK");
             }
-                else
+            else
             {
                 await DisplayAlert("Fout", "Voer een geldige pauzetijd in (in minuten).", "OK");
             }
@@ -148,6 +162,9 @@ public partial class KloktijdenPage : ContentPage
     {
         if (_isOnBreak)
         {
+            var breakDuration = DateTime.Now - _breakStartTime ?? TimeSpan.Zero;
+            _totalBreakTime += breakDuration;
+            Preferences.Set("TotalBreakTime", _totalBreakTime.ToString());
             _isOnBreak = false;
             Preferences.Set("IsOnBreak", false);
             Preferences.Remove("BreakStartTime");

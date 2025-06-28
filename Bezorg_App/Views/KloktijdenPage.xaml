@@ -20,6 +20,13 @@
                    HorizontalTextAlignment="Center"
                    Text="Gewerkt: 0 uur 0 minuten" />
 
+            <!-- Totale pauzetijd -->
+            <Label x:Name="BreakTimeLabel"
+                   FontSize="Medium"
+                   HorizontalOptions="Center"
+                   HorizontalTextAlignment="Center"
+                   Text="Pauze: 0 uur 0 minuten" />
+
             <!-- Knoppen -->
             <Button x:Name="ClockInButton"
                     Text="Begin werken"

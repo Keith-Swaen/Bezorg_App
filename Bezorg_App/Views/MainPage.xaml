@@ -37,6 +37,11 @@
                 Clicked="OnViewStatusesClicked"
                 HorizontalOptions="Fill"
                 HeightRequest="50" />
+            <Button
+                Text="Kloktijden"
+                Clicked="OnKloktijdenClicked"
+                HorizontalOptions="Fill"
+                HeightRequest="50" />   
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

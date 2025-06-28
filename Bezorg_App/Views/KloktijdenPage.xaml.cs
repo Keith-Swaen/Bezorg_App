@@ -107,16 +107,21 @@ namespace Bezorg_App.Views
 
         private void UpdateBreakTime()
         {
+            TimeSpan totalBreak;
+
             if (_isOnBreak)
             {
                 var currentBreakTime = DateTime.Now - _breakStartTime ?? TimeSpan.Zero;
-                BreakTimeLabel.Text = $"Pauze: {_totalBreakTime.Hours + currentBreakTime.Hours} uur {_totalBreakTime.Minutes + currentBreakTime.Minutes} minuten  ({_totalBreakTime.Seconds})";
+                totalBreak = _totalBreakTime + currentBreakTime;
             }
             else
             {
-                BreakTimeLabel.Text = $"Pauze: {_totalBreakTime.Hours} uur {_totalBreakTime.Minutes} minuten";
+                totalBreak = _totalBreakTime;
             }
+
+            BreakTimeLabel.Text = $"Pauze: {totalBreak.Hours} uur {totalBreak.Minutes} minuten ({totalBreak.Seconds})";
         }
+
 
         private async void OnClockInClicked(object sender, EventArgs e)
         {

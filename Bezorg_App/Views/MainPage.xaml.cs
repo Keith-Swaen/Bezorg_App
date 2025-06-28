@@ -15,8 +15,34 @@ namespace Bezorg_App.Views
 
         public MainPage()
         {
+            Preferences.Set("PrivacyConsent", false);
+
             InitializeComponent();
+            CheckPrivacyConsent();
             TestApiKey();
+        }
+
+        private async void CheckPrivacyConsent()
+        {
+            // Controleer of de gebruiker al akkoord is gegaan
+            bool hasAccepted = Preferences.Get("PrivacyConsent", false);
+            if (!hasAccepted)
+            {
+                // Toon de privacy-popup
+                await ShowPrivacyPopup();
+            }
+        }
+
+        private async Task ShowPrivacyPopup()
+        {
+            await DisplayAlert(
+                "Privacyvoorwaarden",
+                "We waarderen je privacy. De Bezorg App verzamelt en verwerkt je gegevens, zoals locatie en bezorginformatie, om een optimale service te bieden. Deze gegevens worden alleen gebruikt voor het uitvoeren van bezorgingen en worden niet gedeeld met derden zonder jouw toestemming. Door verder te gaan, ga je akkoord met ons privacybeleid.",
+                "Ga verder"
+            );
+
+            // Sla keuze op na accepteren
+            Preferences.Set("PrivacyConsent", true);
         }
 
         private async void TestApiKey()
@@ -102,6 +128,11 @@ namespace Bezorg_App.Views
         private async void OnViewStatusesClicked(object sender, EventArgs e)
         {
             await Navigation.PushAsync(new BezorgstatussenPage());
+        }
+        
+        private async void OnKloktijdenClicked(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new KloktijdenPage());
         }
     }
 }

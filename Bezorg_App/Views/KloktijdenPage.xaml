@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Bezorg_App.Views.KloktijdenPage"
+             Title="KloktijdenPage">
+    <ScrollView>
+        <VerticalStackLayout Padding="30,20" Spacing="20">
+            <!-- Statusweergave -->
+            <Label x:Name="StatusLabel"
+                   FontSize="Large"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   HorizontalTextAlignment="Center"
+                   Text="Nog niet ingeklokt" />
+
+            <!-- Gewerkte tijd -->
+            <Label x:Name="WorkTimeLabel"
+                   FontSize="Medium"
+                   HorizontalOptions="Center"
+                   HorizontalTextAlignment="Center"
+                   Text="Gewerkt: 0 uur 0 minuten" />
+
+            <!-- Totale pauzetijd -->
+            <Label x:Name="BreakTimeLabel"
+                   FontSize="Medium"
+                   HorizontalOptions="Center"
+                   HorizontalTextAlignment="Center"
+                   Text="Pauze: 0 uur 0 minuten" />
+
+            <!-- Knoppen -->
+            <Button x:Name="ClockInButton"
+                    Text="Begin werken"
+                    Clicked="OnClockInClicked"
+                    HorizontalOptions="Fill"
+                    HeightRequest="60"
+                    FontSize="Medium"
+                    BackgroundColor="#4CAF50"
+                    TextColor="White" />
+
+            <Button x:Name="ClockOutButton"
+                    Text="Stop werken"
+                    Clicked="OnClockOutClicked"
+                    HorizontalOptions="Fill"
+                    HeightRequest="60"
+                    FontSize="Medium"
+                    BackgroundColor="#F44336"
+                    TextColor="White" />
+
+            <Button x:Name="StartBreakButton"
+                    Text="Pauze starten"
+                    Clicked="OnStartBreakClicked"
+                    HorizontalOptions="Fill"
+                    HeightRequest="60"
+                    FontSize="Medium"
+                    BackgroundColor="#FFC107"
+                    TextColor="Black" />
+
+            <Button x:Name="EndBreakButton"
+                    Text="Pauze stoppen"
+                    Clicked="OnEndBreakClicked"
+                    HorizontalOptions="Fill"
+                    HeightRequest="60"
+                    FontSize="Medium"
+                    BackgroundColor="#2196F3"
+                    TextColor="White" />
+
+            <!-- Pauzetijd invoer -->
+            <Label Text="Pauzetijd (minuten):"
+                   FontSize="Small"
+                   HorizontalOptions="Center" />
+            <Entry x:Name="BreakDurationEntry"
+                   Placeholder="Bijv. 15"
+                   Keyboard="Numeric"
+                   WidthRequest="100"
+                   HorizontalOptions="Center" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

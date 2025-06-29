@@ -20,6 +20,8 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 
+		<NullabilityInfoContextSupport>true</NullabilityInfoContextSupport>
+
 		<AndroidMinSdkVersion>23</AndroidMinSdkVersion>
 		<AndroidTargetSdkVersion>31</AndroidTargetSdkVersion>
 

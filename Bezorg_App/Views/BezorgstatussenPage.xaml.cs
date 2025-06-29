@@ -1,11 +1,12 @@
-﻿using System.Collections.ObjectModel;
+﻿using Bezorg_App.Models;
+using Bezorg_App.Models.Enums;
+using Bezorg_App.Services;
+using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.Controls;
+using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
-using Bezorg_App.Models;
-using Bezorg_App.Services;
-using Microsoft.Maui.Controls;
-using Bezorg_App.Models.Enums;
-using Microsoft.Maui.ApplicationModel;
 
 namespace Bezorg_App.Views
 {
@@ -79,10 +80,20 @@ namespace Bezorg_App.Views
                             return;
                     }
 
+                    //Old
                     // Update lokaal
-                    int index = _allStates.IndexOf(state);
-                    if (index >= 0)
-                        _allStates[index] = updated;
+                    // int index = _allStates.IndexOf(state);
+                    // if (index >= 0)
+                    //     _allStates[index] = updated;
+
+                    //New, update ui wanneer state veranderd
+                    if (updated is not null)
+                    {
+                        state.State = updated.State;
+                        state.DateTime = updated.DateTime;
+                    }
+
+
 
                     await DisplayAlert("Bijgewerkt", $"Nieuwe status: {updated.State}", "OK");
                     LoadCurrentPage();

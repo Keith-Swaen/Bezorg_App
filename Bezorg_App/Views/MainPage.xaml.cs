@@ -88,9 +88,13 @@ namespace Bezorg_App.Views
                               });
 
                 if (location != null)
+                {
                     await DisplayAlert("GPS Locatie", $"Latitude: {location.Latitude}\nLongitude: {location.Longitude}", "OK");
+                }
                 else
+                {
                     await DisplayAlert("Fout", "Kon locatie niet bepalen.", "OK");
+                }
             }
             catch (Exception ex)
             {
@@ -117,7 +121,9 @@ namespace Bezorg_App.Views
                     await Launcher.Default.OpenAsync(url);
                 }
                 else
+                {
                     await DisplayAlert("Fout", "Kon locatie niet bepalen.", "OK");
+                }
             }
             catch (Exception ex)
             {
